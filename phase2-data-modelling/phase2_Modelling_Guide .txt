@@ -1,0 +1,176 @@
+═══════════════════════════════════════════════════════════════════════
+        MALAYSIA AIRPORT SIMULATION — PHASE 2 MODELLING GUIDE
+═══════════════════════════════════════════════════════════════════════
+
+
+───────────────────────────────────────────────────────────────────────
+STEP 2.1 — TABLE INVENTORY
+───────────────────────────────────────────────────────────────────────
+Before doing anything, I need to figure out which tables are fact
+tables and which ones are dimension tables. Pretty straightforward
+once you think about it.
+
+Fact tables = transactional data, lots of rows, changes everyday
+Dimension tables = reference data, small, rarely changes
+
+So for this project:
+
+FACT TABLES:
+  → fact_flights      (50,821 rows) — every single flight record
+  → fact_complaints   (7,000 rows)  — passenger complaints
+
+DIMENSION TABLES:
+  → dim_airports      (15 rows)  — airport info
+  → dim_airlines      (6 rows)   — airline info
+  → dim_date          (730 rows) — date calendar 2023-2024
+  → dim_routes        (20 rows)  — route info
+
+Nothing to do in Power BI here, just need to understand the
+structure before building anything.
+
+
+───────────────────────────────────────────────────────────────────────
+STEP 2.2 — STAR SCHEMA DESIGN
+───────────────────────────────────────────────────────────────────────
+Planned out the relationships before touching anything in Power BI.
+Star schema means fact tables in the middle, dimensions around them.
+
+Relationship plan:
+
+  dim_date     → fact_flights      (via DateKey)
+  dim_date     → fact_complaints   (via DateKey)
+  dim_airlines → fact_flights      (via AirlineCode)
+  dim_airlines → fact_complaints   (via AirlineCode)
+  dim_airports → fact_flights      (via OriginCode)
+  dim_airports → fact_complaints   (via AirportCode)
+  dim_routes   → fact_flights      (via RouteID)
+
+All relationships = Many to One, single direction filter.
+Total = 7 relationships.
+
+Still nothing to build yet — this is just the blueprint.
+
+
+───────────────────────────────────────────────────────────────────────
+STEP 2.3 — RESHAPE CHECK
+───────────────────────────────────────────────────────────────────────
+Checked if any tables needed to be unpivoted or reshaped before
+modelling. Unpivoting is when your data is too wide (columns for
+each month for example) and you need to make it tall instead.
+
+For this project — all tables were already in the right format.
+No unpivoting needed, moved straight to the next step.
+
+
+───────────────────────────────────────────────────────────────────────
+STEP 2.4 — DISABLE AUTO DATE/TIME
+───────────────────────────────────────────────────────────────────────
+This one is easy to miss but really important.
+
+Power BI has this default setting where it automatically creates
+hidden date tables for every single date column in your model.
+Problem is — we already have our own dim_date table. So if we
+leave this on, we end up with duplicate date hierarchies everywhere
+and it messes up DAX later.
+
+Fix is simple:
+  → File → Options and Settings → Options
+  → Current File → Data Load
+  → Untick "Auto date/time"
+  → OK
+
+Done. Clean model from here on.
+
+
+───────────────────────────────────────────────────────────────────────
+STEP 2.5 — BUILD RELATIONSHIPS IN MODEL VIEW
+───────────────────────────────────────────────────────────────────────
+Now the actual fun part. Went into Model View and built all 7
+relationships manually by dragging and dropping columns.
+
+Arranged the tables so it actually looks like a star —
+dimensions on the outside, fact tables in the middle.
+
+Relationships built:
+
+  1. dim_date (DateKey)        → fact_flights (DateKey)
+  2. dim_date (DateKey)        → fact_complaints (DateKey)
+  3. dim_airlines (AirlineCode)→ fact_flights (AirlineCode)
+  4. dim_airlines (AirlineCode)→ fact_complaints (AirlineCode)
+  5. dim_airports (AirportCode)→ fact_flights (OriginCode)
+  6. dim_airports (AirportCode)→ fact_complaints (AirportCode)
+  7. dim_routes (RouteID)      → fact_flights (RouteID)
+
+One thing worth noting for relationship 5 — fact_flights connects
+to dim_airports using OriginCode, not DestCode. This is intentional.
+Analysis is done from the departure airport perspective, which is
+how airport performance is typically measured.
+
+All set to Many to One (*:1), single direction. No bidirectional
+filters — keeps the model clean and avoids ambiguity in DAX.
+
+
+───────────────────────────────────────────────────────────────────────
+STEP 2.6 — DATE TABLE CONFIGURATION
+───────────────────────────────────────────────────────────────────────
+Marked dim_date as the official date table in Power BI. This is
+required for time intelligence DAX functions to work properly
+(things like MTD, YTD, same period last year etc).
+
+  → Table View → click dim_date
+  → Table tools → Mark as date table
+  → Selected column: Date
+  → OK
+
+Power BI validated it automatically — no duplicates, no gaps,
+correct data type. All good.
+
+
+───────────────────────────────────────────────────────────────────────
+STEP 2.7 — HIDE UNNECESSARY COLUMNS
+───────────────────────────────────────────────────────────────────────
+Hid all the foreign key columns from the fact tables. These columns
+are only there to create relationships — they shouldnt show up when
+building visuals because they're just ID codes, not useful labels.
+
+Hidden in fact_flights:
+  → DateKey
+  → AirlineCode
+  → OriginCode
+  → DestCode
+  → RouteID
+
+Hidden in fact_complaints:
+  → DateKey
+  → AirlineCode
+  → AirportCode
+
+Columns in dim tables were left visible — thats where the actual
+descriptive info lives (AirlineName, AirportName etc).
+
+
+───────────────────────────────────────────────────────────────────────
+STEP 2.8 — MODEL VALIDATION
+───────────────────────────────────────────────────────────────────────
+Built a quick Matrix visual to test that the relationships are
+actually working:
+
+  Rows   → dim_airlines[AirlineName]
+  Values → fact_flights[DelayMinutes] (Sum)
+
+Results:
+
+  AirAsia            379,510
+  AirAsia X           81,873
+  Batik Air Malaysia 119,231
+  Firefly             79,578
+  Malaysia Airlines  133,379
+  MASwings           128,274
+  ──────────────────────────
+  Total              921,845
+
+All 6 airlines returned data correctly. Relationship between
+dim_airlines and fact_flights is working as expected.
+
+Model is clean, relationships are solid. Ready for Phase 3 DAX.
+═══════════════════════════════════════════════════════════════════════
