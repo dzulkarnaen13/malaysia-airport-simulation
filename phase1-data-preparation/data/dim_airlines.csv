@@ -1,0 +1,7 @@
+AirlineCode,AirlineName,Type,HubAirport,FleetSize,Founded
+MH,Malaysia Airlines,Full Service,KUL,81,1947
+AK,AirAsia,Low Cost Carrier,KUL,205,2001
+D7,AirAsia X,Low Cost Carrier,KUL,32,2007
+OD,Batik Air Malaysia,Full Service,KUL,34,2013
+FY,Firefly,Regional,PEN,12,2007
+MF,MASwings,Rural Air Service,BKI,14,2007

@@ -1,0 +1,16 @@
+AirportCode,AirportName,City,State,Region,Latitude,Longitude,AirportTier
+KUL,Kuala Lumpur International Airport (KLIA/klia2),Sepang,Selangor,Peninsular,2.7456,101.7099,Hub
+PEN,Penang International Airport,Georgetown,Penang,Peninsular,5.2977,100.2769,Regional
+JHB,Senai International Airport,Johor Bahru,Johor,Peninsular,1.6413,103.6698,Regional
+KUA,Sultan Ahmad Shah Airport,Kuantan,Pahang,Peninsular,3.7753,103.2090,Regional
+TGG,Sultan Mahmud Airport,Kuala Terengganu,Terengganu,Peninsular,5.3826,103.1034,Regional
+KBR,Sultan Ismail Petra Airport,Kota Bharu,Kelantan,Peninsular,6.1668,102.2932,Regional
+AOR,Sultan Abdul Halim Airport,Alor Setar,Kedah,Peninsular,6.1897,100.3983,Regional
+LGK,Langkawi International Airport,Langkawi,Kedah,Peninsular,6.3297,99.7287,Regional
+IPH,Sultan Azlan Shah Airport,Ipoh,Perak,Peninsular,4.5679,101.0921,Regional
+BKI,Kota Kinabalu International Airport,Kota Kinabalu,Sabah,East Malaysia,5.9372,116.0508,Hub
+KCH,Kuching International Airport,Kuching,Sarawak,East Malaysia,1.4847,110.3467,Hub
+MYY,Miri Airport,Miri,Sarawak,East Malaysia,4.3220,113.9869,Regional
+SDK,Sandakan Airport,Sandakan,Sabah,East Malaysia,5.9009,118.0588,Regional
+TWU,Tawau Airport,Tawau,Sabah,East Malaysia,4.3201,118.1278,Regional
+SBW,Sibu Airport,Sibu,Sarawak,East Malaysia,2.2616,111.9853,Regional
